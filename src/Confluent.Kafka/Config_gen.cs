@@ -367,6 +367,14 @@ namespace Confluent.Kafka
         public string ClientId { get { return Get("client.id"); } set { this.SetObject("client.id", value); } }
 
         /// <summary>
+        ///     Client Software Identifier
+        ///
+        ///     default: librdkafka
+        ///     importance: low
+        /// </summary>
+        public string ClientSoftwareName { get { return Get("client.software.name"); } set { this.SetObject("client.software.name"); } }
+
+        /// <summary>
         ///     Initial list of brokers as a CSV list of broker host or host:port. The application may also use `rd_kafka_brokers_add()` to add brokers during runtime.
         ///
         ///     default: ''
