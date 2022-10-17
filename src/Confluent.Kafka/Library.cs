@@ -133,7 +133,7 @@ namespace Confluent.Kafka
             {
                 return new List<KeyValuePair<string, string>>
                 {
-                    new KeyValuePair<string, string>( "client.software.name", "confluent-kafka-dotnet"),
+                    new KeyValuePair<string, string>( "client.software.name", "librdkafka"),
                     new KeyValuePair<string, string>( "client.software.version", VersionString )
                 };
             }
