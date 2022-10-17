@@ -177,22 +177,6 @@ namespace Confluent.Kafka
     }
 
     /// <summary>
-    ///     GroupProtocol enum values
-    /// </summary>
-    public enum GroupProtocol
-    {
-        /// <summary>
-        ///     Classic
-        /// </summary>
-        Classic,
-
-        /// <summary>
-        ///     Consumer
-        /// </summary>
-        Consumer
-    }
-
-    /// <summary>
     ///     IsolationLevel enum values
     /// </summary>
     public enum IsolationLevel
@@ -237,22 +221,6 @@ namespace Confluent.Kafka
         ///     Zstd
         /// </summary>
         Zstd
-    }
-
-    /// <summary>
-    ///     ClientDnsLookup enum values
-    /// </summary>
-    public enum ClientDnsLookup
-    {
-        /// <summary>
-        ///     UseAllDnsIps
-        /// </summary>
-        UseAllDnsIps,
-
-        /// <summary>
-        ///     ResolveCanonicalBootstrapServersOnly
-        /// </summary>
-        ResolveCanonicalBootstrapServersOnly
     }
 
     /// <summary>
@@ -399,6 +367,14 @@ namespace Confluent.Kafka
         public string ClientId { get { return Get("client.id"); } set { this.SetObject("client.id", value); } }
 
         /// <summary>
+        ///     Client Software Identifier
+        ///
+        ///     default: librdkafka
+        ///     importance: low
+        /// </summary>
+        public string ClientSoftwareName { get { return Get("client.software.name"); } set { this.SetObject("client.software.name"); } }
+
+        /// <summary>
         ///     Initial list of brokers as a CSV list of broker host or host:port. The application may also use `rd_kafka_brokers_add()` to add brokers during runtime.
         ///
         ///     default: ''
@@ -455,9 +431,9 @@ namespace Confluent.Kafka
         public int? MetadataMaxAgeMs { get { return GetInt("metadata.max.age.ms"); } set { this.SetObject("metadata.max.age.ms", value); } }
 
         /// <summary>
-        ///     When a topic loses its leader a new metadata request will be enqueued immediately and then with this initial interval, exponentially increasing upto `retry.backoff.max.ms`, until the topic metadata has been refreshed. If not set explicitly, it will be defaulted to `retry.backoff.ms`. This is used to recover quickly from transitioning leader brokers.
+        ///     When a topic loses its leader a new metadata request will be enqueued with this initial interval, exponentially increasing until the topic metadata has been refreshed. This is used to recover quickly from transitioning leader brokers.
         ///
-        ///     default: 100
+        ///     default: 250
         ///     importance: low
         /// </summary>
         public int? TopicMetadataRefreshFastIntervalMs { get { return GetInt("topic.metadata.refresh.fast.interval.ms"); } set { this.SetObject("topic.metadata.refresh.fast.interval.ms", value); } }
@@ -671,14 +647,6 @@ namespace Confluent.Kafka
         public string BrokerVersionFallback { get { return Get("broker.version.fallback"); } set { this.SetObject("broker.version.fallback", value); } }
 
         /// <summary>
-        ///     Allow automatic topic creation on the broker when subscribing to or assigning non-existent topics. The broker must also be configured with `auto.create.topics.enable=true` for this configuration to take effect. Note: the default value (true) for the producer is different from the default value (false) for the consumer. Further, the consumer default value is different from the Java consumer (true), and this property is not supported by the Java producer. Requires broker version >= 0.11.0.0, for older broker versions only the broker configuration applies.
-        ///
-        ///     default: false
-        ///     importance: low
-        /// </summary>
-        public bool? AllowAutoCreateTopics { get { return GetBool("allow.auto.create.topics"); } set { this.SetObject("allow.auto.create.topics", value); } }
-
-        /// <summary>
         ///     Protocol used to communicate with brokers.
         ///
         ///     default: plaintext
@@ -799,15 +767,7 @@ namespace Confluent.Kafka
         public string SslKeystorePassword { get { return Get("ssl.keystore.password"); } set { this.SetObject("ssl.keystore.password", value); } }
 
         /// <summary>
-        ///     Comma-separated list of OpenSSL 3.0.x implementation providers. E.g., "default,legacy".
-        ///
-        ///     default: ''
-        ///     importance: low
-        /// </summary>
-        public string SslProviders { get { return Get("ssl.providers"); } set { this.SetObject("ssl.providers", value); } }
-
-        /// <summary>
-        ///     **DEPRECATED** Path to OpenSSL engine library. OpenSSL >= 1.1.x required. DEPRECATED: OpenSSL engine support is deprecated and should be replaced by OpenSSL 3 providers.
+        ///     Path to OpenSSL engine library. OpenSSL >= 1.1.0 required.
         ///
         ///     default: ''
         ///     importance: low
@@ -833,7 +793,7 @@ namespace Confluent.Kafka
         /// <summary>
         ///     Endpoint identification algorithm to validate broker hostname using broker certificate. https - Server (broker) hostname verification as specified in RFC2818. none - No endpoint verification. OpenSSL >= 1.0.2 required.
         ///
-        ///     default: https
+        ///     default: none
         ///     importance: low
         /// </summary>
         public SslEndpointIdentificationAlgorithm? SslEndpointIdentificationAlgorithm { get { return (SslEndpointIdentificationAlgorithm?)GetEnum(typeof(SslEndpointIdentificationAlgorithm), "ssl.endpoint.identification.algorithm"); } set { this.SetObject("ssl.endpoint.identification.algorithm", value); } }
@@ -973,38 +933,6 @@ namespace Confluent.Kafka
         ///     importance: low
         /// </summary>
         public string ClientRack { get { return Get("client.rack"); } set { this.SetObject("client.rack", value); } }
-
-        /// <summary>
-        ///     The backoff time in milliseconds before retrying a protocol request, this is the first backoff time, and will be backed off exponentially until number of retries is exhausted, and it's capped by retry.backoff.max.ms.
-        ///
-        ///     default: 100
-        ///     importance: medium
-        /// </summary>
-        public int? RetryBackoffMs { get { return GetInt("retry.backoff.ms"); } set { this.SetObject("retry.backoff.ms", value); } }
-
-        /// <summary>
-        ///     The max backoff time in milliseconds before retrying a protocol request, this is the atmost backoff allowed for exponentially backed off requests.
-        ///
-        ///     default: 1000
-        ///     importance: medium
-        /// </summary>
-        public int? RetryBackoffMaxMs { get { return GetInt("retry.backoff.max.ms"); } set { this.SetObject("retry.backoff.max.ms", value); } }
-
-        /// <summary>
-        ///     Controls how the client uses DNS lookups. By default, when the lookup returns multiple IP addresses for a hostname, they will all be attempted for connection before the connection is considered failed. This applies to both bootstrap and advertised servers. If the value is set to `resolve_canonical_bootstrap_servers_only`, each entry will be resolved and expanded into a list of canonical names. **WARNING**: `resolve_canonical_bootstrap_servers_only` must only be used with `GSSAPI` (Kerberos) as `sasl.mechanism`, as it's the only purpose of this configuration value. **NOTE**: Default here is different from the Java client's default behavior, which connects only to the first IP address returned for a hostname.
-        ///
-        ///     default: use_all_dns_ips
-        ///     importance: low
-        /// </summary>
-        public ClientDnsLookup? ClientDnsLookup { get { return (ClientDnsLookup?)GetEnum(typeof(ClientDnsLookup), "client.dns.lookup"); } set { this.SetObject("client.dns.lookup", value); } }
-
-        /// <summary>
-        ///     Whether to enable pushing of client metrics to the cluster, if the cluster has a client metrics subscription which matches this client
-        ///
-        ///     default: true
-        ///     importance: low
-        /// </summary>
-        public bool? EnableMetricsPush { get { return GetBool("enable.metrics.push"); } set { this.SetObject("enable.metrics.push", value); } }
 
     }
 
@@ -1189,7 +1117,7 @@ namespace Confluent.Kafka
         public bool? EnableGaplessGuarantee { get { return GetBool("enable.gapless.guarantee"); } set { this.SetObject("enable.gapless.guarantee", value); } }
 
         /// <summary>
-        ///     Maximum number of messages allowed on the producer queue. This queue is shared by all topics and partitions. A value of 0 disables this limit.
+        ///     Maximum number of messages allowed on the producer queue. This queue is shared by all topics and partitions.
         ///
         ///     default: 100000
         ///     importance: high
@@ -1219,6 +1147,152 @@ namespace Confluent.Kafka
         ///     importance: high
         /// </summary>
         public int? MessageSendMaxRetries { get { return GetInt("message.send.max.retries"); } set { this.SetObject("message.send.max.retries", value); } }
+
+        /// <summary>
+        ///     The backoff time in milliseconds before retrying a protocol request.
+        ///
+        ///     default: 100
+        ///     importance: medium
+        /// </summary>
+        public int? RetryBackoffMs { get { return GetInt("retry.backoff.ms"); } set { this.SetObject("retry.backoff.ms", value); } }
+
+        /// <summary>
+        ///     The threshold of outstanding not yet transmitted broker requests needed to backpressure the producer's message accumulator. If the number of not yet transmitted requests equals or exceeds this number, produce request creation that would have otherwise been triggered (for example, in accordance with linger.ms) will be delayed. A lower number yields larger and more effective batches. A higher value can improve latency when using compression on slow machines.
+        ///
+        ///     default: 1
+        ///     importance: low
+        /// </summary>
+        public int? QueueBufferingBackpressureThreshold { get { return GetInt("queue.buffering.backpressure.threshold"); } set { this.SetObject("queue.buffering.backpressure.threshold", value); } }
+
+        /// <summary>
+        ///     compression codec to use for compressing message sets. This is the default value for all topics, may be overridden by the topic configuration property `compression.codec`.
+        ///
+        ///     default: none
+        ///     importance: medium
+        /// </summary>
+        public CompressionType? CompressionType { get { return (CompressionType?)GetEnum(typeof(CompressionType), "compression.type"); } set { this.SetObject("compression.type", value); } }
+
+        /// <summary>
+        ///     Maximum number of messages batched in one MessageSet. The total MessageSet size is also limited by batch.size and message.max.bytes.
+        ///
+        ///     default: 10000
+        ///     importance: medium
+        /// </summary>
+        public int? BatchNumMessages { get { return GetInt("batch.num.messages"); } set { this.SetObject("batch.num.messages", value); } }
+
+        /// <summary>
+        ///     Maximum size (in bytes) of all messages batched in one MessageSet, including protocol framing overhead. This limit is applied after the first message has been added to the batch, regardless of the first message's size, this is to ensure that messages that exceed batch.size are produced. The total MessageSet size is also limited by batch.num.messages and message.max.bytes.
+        ///
+        ///     default: 1000000
+        ///     importance: medium
+        /// </summary>
+        public int? BatchSize { get { return GetInt("batch.size"); } set { this.SetObject("batch.size", value); } }
+
+        /// <summary>
+        ///     Delay in milliseconds to wait to assign new sticky partitions for each topic. By default, set to double the time of linger.ms. To disable sticky behavior, set to 0. This behavior affects messages with the key NULL in all cases, and messages with key lengths of zero when the consistent_random partitioner is in use. These messages would otherwise be assigned randomly. A higher value allows for more effective batching of these messages.
+        ///
+        ///     default: 10
+        ///     importance: low
+        /// </summary>
+        public int? StickyPartitioningLingerMs { get { return GetInt("sticky.partitioning.linger.ms"); } set { this.SetObject("sticky.partitioning.linger.ms", value); } }
+
+    }
+
+        /// <summary>
+        ///     Local message timeout. This value is only enforced locally and limits the time a produced message waits for successful delivery. A time of 0 is infinite. This is the maximum time librdkafka may use to deliver a message (including retries). Delivery error occurs when either the retry count or the message timeout are exceeded. The message timeout is automatically adjusted to `transaction.timeout.ms` if `transactional.id` is configured.
+        ///
+        ///     default: 300000
+        ///     importance: high
+        /// </summary>
+        public int? MessageTimeoutMs { get { return GetInt("message.timeout.ms"); } set { this.SetObject("message.timeout.ms", value); } }
+
+        /// <summary>
+        ///     Partitioner: `random` - random distribution, `consistent` - CRC32 hash of key (Empty and NULL keys are mapped to single partition), `consistent_random` - CRC32 hash of key (Empty and NULL keys are randomly partitioned), `murmur2` - Java Producer compatible Murmur2 hash of key (NULL keys are mapped to single partition), `murmur2_random` - Java Producer compatible Murmur2 hash of key (NULL keys are randomly partitioned. This is functionally equivalent to the default partitioner in the Java Producer.), `fnv1a` - FNV-1a hash of key (NULL keys are mapped to single partition), `fnv1a_random` - FNV-1a hash of key (NULL keys are randomly partitioned).
+        ///
+        ///     default: consistent_random
+        ///     importance: high
+        /// </summary>
+        public Partitioner? Partitioner { get { return (Partitioner?)GetEnum(typeof(Partitioner), "partitioner"); } set { this.SetObject("partitioner", value); } }
+
+        /// <summary>
+        ///     Compression level parameter for algorithm selected by configuration property `compression.codec`. Higher values will result in better compression at the cost of more CPU usage. Usable range is algorithm-dependent: [0-9] for gzip; [0-12] for lz4; only 0 for snappy; -1 = codec-dependent default compression level.
+        ///
+        ///     default: -1
+        ///     importance: medium
+        /// </summary>
+        public int? CompressionLevel { get { return GetInt("compression.level"); } set { this.SetObject("compression.level", value); } }
+
+        /// <summary>
+        ///     Enables the transactional producer. The transactional.id is used to identify the same transactional producer instance across process restarts. It allows the producer to guarantee that transactions corresponding to earlier instances of the same producer have been finalized prior to starting any new transactions, and that any zombie instances are fenced off. If no transactional.id is provided, then the producer is limited to idempotent delivery (if enable.idempotence is set). Requires broker version >= 0.11.0.
+        ///
+        ///     default: ''
+        ///     importance: high
+        /// </summary>
+        public string TransactionalId { get { return Get("transactional.id"); } set { this.SetObject("transactional.id", value); } }
+
+        /// <summary>
+        ///     The maximum amount of time in milliseconds that the transaction coordinator will wait for a transaction status update from the producer before proactively aborting the ongoing transaction. If this value is larger than the `transaction.max.timeout.ms` setting in the broker, the init_transactions() call will fail with ERR_INVALID_TRANSACTION_TIMEOUT. The transaction timeout automatically adjusts `message.timeout.ms` and `socket.timeout.ms`, unless explicitly configured in which case they must not exceed the transaction timeout (`socket.timeout.ms` must be at least 100ms lower than `transaction.timeout.ms`). This is also the default timeout value if no timeout (-1) is supplied to the transactional API methods.
+        ///
+        ///     default: 60000
+        ///     importance: medium
+        /// </summary>
+        public int? TransactionTimeoutMs { get { return GetInt("transaction.timeout.ms"); } set { this.SetObject("transaction.timeout.ms", value); } }
+
+        /// <summary>
+        ///     When set to `true`, the producer will ensure that messages are successfully produced exactly once and in the original produce order. The following configuration properties are adjusted automatically (if not modified by the user) when idempotence is enabled: `max.in.flight.requests.per.connection=5` (must be less than or equal to 5), `retries=INT32_MAX` (must be greater than 0), `acks=all`, `queuing.strategy=fifo`. Producer instantation will fail if user-supplied configuration is incompatible.
+        ///
+        ///     default: false
+        ///     importance: high
+        /// </summary>
+        public bool? EnableIdempotence { get { return GetBool("enable.idempotence"); } set { this.SetObject("enable.idempotence", value); } }
+
+        /// <summary>
+        ///     **EXPERIMENTAL**: subject to change or removal. When set to `true`, any error that could result in a gap in the produced message series when a batch of messages fails, will raise a fatal error (ERR__GAPLESS_GUARANTEE) and stop the producer. Messages failing due to `message.timeout.ms` are not covered by this guarantee. Requires `enable.idempotence=true`.
+        ///
+        ///     default: false
+        ///     importance: low
+        /// </summary>
+        public bool? EnableGaplessGuarantee { get { return GetBool("enable.gapless.guarantee"); } set { this.SetObject("enable.gapless.guarantee", value); } }
+
+        /// <summary>
+        ///     Maximum number of messages allowed on the producer queue. This queue is shared by all topics and partitions.
+        ///
+        ///     default: 100000
+        ///     importance: high
+        /// </summary>
+        public int? QueueBufferingMaxMessages { get { return GetInt("queue.buffering.max.messages"); } set { this.SetObject("queue.buffering.max.messages", value); } }
+
+        /// <summary>
+        ///     Maximum total message size sum allowed on the producer queue. This queue is shared by all topics and partitions. This property has higher priority than queue.buffering.max.messages.
+        ///
+        ///     default: 1048576
+        ///     importance: high
+        /// </summary>
+        public int? QueueBufferingMaxKbytes { get { return GetInt("queue.buffering.max.kbytes"); } set { this.SetObject("queue.buffering.max.kbytes", value); } }
+
+        /// <summary>
+        ///     Delay in milliseconds to wait for messages in the producer queue to accumulate before constructing message batches (MessageSets) to transmit to brokers. A higher value allows larger and more effective (less overhead, improved compression) batches of messages to accumulate at the expense of increased message delivery latency.
+        ///
+        ///     default: 5
+        ///     importance: high
+        /// </summary>
+        public double? LingerMs { get { return GetDouble("linger.ms"); } set { this.SetObject("linger.ms", value); } }
+
+        /// <summary>
+        ///     How many times to retry sending a failing Message. **Note:** retrying may cause reordering unless `enable.idempotence` is set to true.
+        ///
+        ///     default: 2147483647
+        ///     importance: high
+        /// </summary>
+        public int? MessageSendMaxRetries { get { return GetInt("message.send.max.retries"); } set { this.SetObject("message.send.max.retries", value); } }
+
+        /// <summary>
+        ///     The backoff time in milliseconds before retrying a protocol request.
+        ///
+        ///     default: 100
+        ///     importance: medium
+        /// </summary>
+        public int? RetryBackoffMs { get { return GetInt("retry.backoff.ms"); } set { this.SetObject("retry.backoff.ms", value); } }
 
         /// <summary>
         ///     The threshold of outstanding not yet transmitted broker requests needed to backpressure the producer's message accumulator. If the number of not yet transmitted requests equals or exceeds this number, produce request creation that would have otherwise been triggered (for example, in accordance with linger.ms) will be delayed. A lower number yields larger and more effective batches. A higher value can improve latency when using compression on slow machines.
@@ -1365,28 +1439,12 @@ namespace Confluent.Kafka
         public int? HeartbeatIntervalMs { get { return GetInt("heartbeat.interval.ms"); } set { this.SetObject("heartbeat.interval.ms", value); } }
 
         /// <summary>
-        ///     Group protocol type for the `classic` group protocol. NOTE: Currently, the only supported group protocol type is `consumer`.
+        ///     Group protocol type. NOTE: Currently, the only supported group protocol type is `consumer`.
         ///
         ///     default: consumer
         ///     importance: low
         /// </summary>
         public string GroupProtocolType { get { return Get("group.protocol.type"); } set { this.SetObject("group.protocol.type", value); } }
-
-        /// <summary>
-        ///     Group protocol to use. Use `classic` for the original protocol and `consumer` for the new protocol introduced in KIP-848. Available protocols: classic or consumer. Default is `classic`, but will change to `consumer` in next releases.
-        ///
-        ///     default: classic
-        ///     importance: high
-        /// </summary>
-        public GroupProtocol? GroupProtocol { get { return (GroupProtocol?)GetEnum(typeof(GroupProtocol), "group.protocol"); } set { this.SetObject("group.protocol", value); } }
-
-        /// <summary>
-        ///     Server side assignor to use. Keep it null to make server select a suitable assignor for the group. Available assignors: uniform or range. Default is null
-        ///
-        ///     default: ''
-        ///     importance: medium
-        /// </summary>
-        public string GroupRemoteAssignor { get { return Get("group.remote.assignor"); } set { this.SetObject("group.remote.assignor", value); } }
 
         /// <summary>
         ///     How often to query for the current client group coordinator. If the currently assigned coordinator is down the configured query interval will be divided by ten to more quickly recover in case of coordinator reassignment.
@@ -1453,12 +1511,182 @@ namespace Confluent.Kafka
         public int? FetchWaitMaxMs { get { return GetInt("fetch.wait.max.ms"); } set { this.SetObject("fetch.wait.max.ms", value); } }
 
         /// <summary>
-        ///     How long to postpone the next fetch request for a topic+partition in case the current fetch queue thresholds (queued.min.messages or queued.max.messages.kbytes) have been exceded. This property may need to be decreased if the queue thresholds are set low and the application is experiencing long (~1s) delays between messages. Low values may increase CPU utilization.
+        ///     Initial maximum number of bytes per topic+partition to request when fetching messages from the broker. If the client encounters a message larger than this value it will gradually try to increase it until the entire message can be fetched.
         ///
-        ///     default: 1000
+        ///     default: 1048576
         ///     importance: medium
         /// </summary>
-        public int? FetchQueueBackoffMs { get { return GetInt("fetch.queue.backoff.ms"); } set { this.SetObject("fetch.queue.backoff.ms", value); } }
+        public int? MaxPartitionFetchBytes { get { return GetInt("max.partition.fetch.bytes"); } set { this.SetObject("max.partition.fetch.bytes", value); } }
+
+        /// <summary>
+        ///     Maximum amount of data the broker shall return for a Fetch request. Messages are fetched in batches by the consumer and if the first message batch in the first non-empty partition of the Fetch request is larger than this value, then the message batch will still be returned to ensure the consumer can make progress. The maximum message batch size accepted by the broker is defined via `message.max.bytes` (broker config) or `max.message.bytes` (broker topic config). `fetch.max.bytes` is automatically adjusted upwards to be at least `message.max.bytes` (consumer config).
+        ///
+        ///     default: 52428800
+        ///     importance: medium
+        /// </summary>
+        public int? FetchMaxBytes { get { return GetInt("fetch.max.bytes"); } set { this.SetObject("fetch.max.bytes", value); } }
+
+        /// <summary>
+        ///     Minimum number of bytes the broker responds with. If fetch.wait.max.ms expires the accumulated data will be sent to the client regardless of this setting.
+        ///
+        ///     default: 1
+        ///     importance: low
+        /// </summary>
+        public int? FetchMinBytes { get { return GetInt("fetch.min.bytes"); } set { this.SetObject("fetch.min.bytes", value); } }
+
+        /// <summary>
+        ///     How long to postpone the next fetch request for a topic+partition in case of a fetch error.
+        ///
+        ///     default: 500
+        ///     importance: medium
+        /// </summary>
+        public int? FetchErrorBackoffMs { get { return GetInt("fetch.error.backoff.ms"); } set { this.SetObject("fetch.error.backoff.ms", value); } }
+
+        /// <summary>
+        ///     Controls how to read messages written transactionally: `read_committed` - only return transactional messages which have been committed. `read_uncommitted` - return all messages, even transactional messages which have been aborted.
+        ///
+        ///     default: read_committed
+        ///     importance: high
+        /// </summary>
+        public IsolationLevel? IsolationLevel { get { return (IsolationLevel?)GetEnum(typeof(IsolationLevel), "isolation.level"); } set { this.SetObject("isolation.level", value); } }
+
+        /// <summary>
+        ///     Emit RD_KAFKA_RESP_ERR__PARTITION_EOF event whenever the consumer reaches the end of a partition.
+        ///
+        ///     default: false
+        ///     importance: low
+        /// </summary>
+        public bool? EnablePartitionEof { get { return GetBool("enable.partition.eof"); } set { this.SetObject("enable.partition.eof", value); } }
+
+        /// <summary>
+        ///     Verify CRC32 of consumed messages, ensuring no on-the-wire or on-disk corruption to the messages occurred. This check comes at slightly increased CPU usage.
+        ///
+        ///     default: false
+        ///     importance: medium
+        /// </summary>
+        public bool? CheckCrcs { get { return GetBool("check.crcs"); } set { this.SetObject("check.crcs", value); } }
+
+        /// <summary>
+        ///     Allow automatic topic creation on the broker when subscribing to or assigning non-existent topics. The broker must also be configured with `auto.create.topics.enable=true` for this configuraiton to take effect. Note: The default value (false) is different from the Java consumer (true). Requires broker version >= 0.11.0.0, for older broker versions only the broker configuration applies.
+        ///
+        ///     default: false
+        ///     importance: low
+        /// </summary>
+        public bool? AllowAutoCreateTopics { get { return GetBool("allow.auto.create.topics"); } set { this.SetObject("allow.auto.create.topics", value); } }
+
+    }
+
+        /// <summary>
+        ///     Client group id string. All clients sharing the same group.id belong to the same group.
+        ///
+        ///     default: ''
+        ///     importance: high
+        /// </summary>
+        public string GroupId { get { return Get("group.id"); } set { this.SetObject("group.id", value); } }
+
+        /// <summary>
+        ///     Enable static group membership. Static group members are able to leave and rejoin a group within the configured `session.timeout.ms` without prompting a group rebalance. This should be used in combination with a larger `session.timeout.ms` to avoid group rebalances caused by transient unavailability (e.g. process restarts). Requires broker version >= 2.3.0.
+        ///
+        ///     default: ''
+        ///     importance: medium
+        /// </summary>
+        public string GroupInstanceId { get { return Get("group.instance.id"); } set { this.SetObject("group.instance.id", value); } }
+
+        /// <summary>
+        ///     The name of one or more partition assignment strategies. The elected group leader will use a strategy supported by all members of the group to assign partitions to group members. If there is more than one eligible strategy, preference is determined by the order of this list (strategies earlier in the list have higher priority). Cooperative and non-cooperative (eager) strategies must not be mixed. Available strategies: range, roundrobin, cooperative-sticky.
+        ///
+        ///     default: range,roundrobin
+        ///     importance: medium
+        /// </summary>
+        public PartitionAssignmentStrategy? PartitionAssignmentStrategy { get { return (PartitionAssignmentStrategy?)GetEnum(typeof(PartitionAssignmentStrategy), "partition.assignment.strategy"); } set { this.SetObject("partition.assignment.strategy", value); } }
+
+        /// <summary>
+        ///     Client group session and failure detection timeout. The consumer sends periodic heartbeats (heartbeat.interval.ms) to indicate its liveness to the broker. If no hearts are received by the broker for a group member within the session timeout, the broker will remove the consumer from the group and trigger a rebalance. The allowed range is configured with the **broker** configuration properties `group.min.session.timeout.ms` and `group.max.session.timeout.ms`. Also see `max.poll.interval.ms`.
+        ///
+        ///     default: 45000
+        ///     importance: high
+        /// </summary>
+        public int? SessionTimeoutMs { get { return GetInt("session.timeout.ms"); } set { this.SetObject("session.timeout.ms", value); } }
+
+        /// <summary>
+        ///     Group session keepalive heartbeat interval.
+        ///
+        ///     default: 3000
+        ///     importance: low
+        /// </summary>
+        public int? HeartbeatIntervalMs { get { return GetInt("heartbeat.interval.ms"); } set { this.SetObject("heartbeat.interval.ms", value); } }
+
+        /// <summary>
+        ///     Group protocol type. NOTE: Currently, the only supported group protocol type is `consumer`.
+        ///
+        ///     default: consumer
+        ///     importance: low
+        /// </summary>
+        public string GroupProtocolType { get { return Get("group.protocol.type"); } set { this.SetObject("group.protocol.type", value); } }
+
+        /// <summary>
+        ///     How often to query for the current client group coordinator. If the currently assigned coordinator is down the configured query interval will be divided by ten to more quickly recover in case of coordinator reassignment.
+        ///
+        ///     default: 600000
+        ///     importance: low
+        /// </summary>
+        public int? CoordinatorQueryIntervalMs { get { return GetInt("coordinator.query.interval.ms"); } set { this.SetObject("coordinator.query.interval.ms", value); } }
+
+        /// <summary>
+        ///     Maximum allowed time between calls to consume messages (e.g., rd_kafka_consumer_poll()) for high-level consumers. If this interval is exceeded the consumer is considered failed and the group will rebalance in order to reassign the partitions to another consumer group member. Warning: Offset commits may be not possible at this point. Note: It is recommended to set `enable.auto.offset.store=false` for long-time processing applications and then explicitly store offsets (using offsets_store()) *after* message processing, to make sure offsets are not auto-committed prior to processing has finished. The interval is checked two times per second. See KIP-62 for more information.
+        ///
+        ///     default: 300000
+        ///     importance: high
+        /// </summary>
+        public int? MaxPollIntervalMs { get { return GetInt("max.poll.interval.ms"); } set { this.SetObject("max.poll.interval.ms", value); } }
+
+        /// <summary>
+        ///     Automatically and periodically commit offsets in the background. Note: setting this to false does not prevent the consumer from fetching previously committed start offsets. To circumvent this behaviour set specific start offsets per partition in the call to assign().
+        ///
+        ///     default: true
+        ///     importance: high
+        /// </summary>
+        public bool? EnableAutoCommit { get { return GetBool("enable.auto.commit"); } set { this.SetObject("enable.auto.commit", value); } }
+
+        /// <summary>
+        ///     The frequency in milliseconds that the consumer offsets are committed (written) to offset storage. (0 = disable). This setting is used by the high-level consumer.
+        ///
+        ///     default: 5000
+        ///     importance: medium
+        /// </summary>
+        public int? AutoCommitIntervalMs { get { return GetInt("auto.commit.interval.ms"); } set { this.SetObject("auto.commit.interval.ms", value); } }
+
+        /// <summary>
+        ///     Automatically store offset of last message provided to application. The offset store is an in-memory store of the next offset to (auto-)commit for each partition.
+        ///
+        ///     default: true
+        ///     importance: high
+        /// </summary>
+        public bool? EnableAutoOffsetStore { get { return GetBool("enable.auto.offset.store"); } set { this.SetObject("enable.auto.offset.store", value); } }
+
+        /// <summary>
+        ///     Minimum number of messages per topic+partition librdkafka tries to maintain in the local consumer queue.
+        ///
+        ///     default: 100000
+        ///     importance: medium
+        /// </summary>
+        public int? QueuedMinMessages { get { return GetInt("queued.min.messages"); } set { this.SetObject("queued.min.messages", value); } }
+
+        /// <summary>
+        ///     Maximum number of kilobytes of queued pre-fetched messages in the local consumer queue. If using the high-level consumer this setting applies to the single consumer queue, regardless of the number of partitions. When using the legacy simple consumer or when separate partition queues are used this setting applies per partition. This value may be overshot by fetch.message.max.bytes. This property has higher priority than queued.min.messages.
+        ///
+        ///     default: 65536
+        ///     importance: medium
+        /// </summary>
+        public int? QueuedMaxMessagesKbytes { get { return GetInt("queued.max.messages.kbytes"); } set { this.SetObject("queued.max.messages.kbytes", value); } }
+
+        /// <summary>
+        ///     Maximum time the broker may wait to fill the Fetch response with fetch.min.bytes of messages.
+        ///
+        ///     default: 500
+        ///     importance: low
+        /// </summary>
+        public int? FetchWaitMaxMs { get { return GetInt("fetch.wait.max.ms"); } set { this.SetObject("fetch.wait.max.ms", value); } }
 
         /// <summary>
         ///     Initial maximum number of bytes per topic+partition to request when fetching messages from the broker. If the client encounters a message larger than this value it will gradually try to increase it until the entire message can be fetched.
@@ -1515,6 +1743,14 @@ namespace Confluent.Kafka
         ///     importance: medium
         /// </summary>
         public bool? CheckCrcs { get { return GetBool("check.crcs"); } set { this.SetObject("check.crcs", value); } }
+
+        /// <summary>
+        ///     Allow automatic topic creation on the broker when subscribing to or assigning non-existent topics. The broker must also be configured with `auto.create.topics.enable=true` for this configuraiton to take effect. Note: The default value (false) is different from the Java consumer (true). Requires broker version >= 0.11.0.0, for older broker versions only the broker configuration applies.
+        ///
+        ///     default: false
+        ///     importance: low
+        /// </summary>
+        public bool? AllowAutoCreateTopics { get { return GetBool("allow.auto.create.topics"); } set { this.SetObject("allow.auto.create.topics", value); } }
 
     }
 
